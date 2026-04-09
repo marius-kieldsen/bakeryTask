@@ -1,14 +1,39 @@
 package opgave1;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 public class BagerCounter {
-    private int lastIssued;
-    private int lastCalled;
-//    private int peopleWaiting = lastIssued - lastCalled;
+    private volatile int lastIssued;
+    private Queue<Integer> queue = new LinkedList<>();
+
+    volatile boolean flag[] = new boolean[]{false, false};
+    volatile int turn;
 
 
-    public static void tagerRanTid (int max) {
+    public void setFlag(boolean flag, int id) { this.flag[id] = flag; }
+    public boolean getFlag(int id) { return flag[id]; }
+    public void setTurn(int turn) { this.turn = turn; }
+    public int getTurn() { return turn; }
+
+    public int takeNumber() {
+        lastIssued++;
+        queue.add(lastIssued);
+        System.out.println("Kunde trak nr. " + lastIssued + " | Udleveret i alt: " + lastIssued);
+        return lastIssued;
+    }
+
+    public void callNext() {
+        if (!queue.isEmpty()) {
+            int number = queue.poll();
+            System.out.println("Ekspedient råber nr. " + number + " op | Kø: " + queue.size());
+        }
+    }
+
+    public int getWaiting() { return queue.size(); }
+
+    public static void tagerRandomTid(int max) {
         int x, y;
         Random r = new Random(1023);
         int max2 = Math.abs(r.nextInt() % max + 1);
